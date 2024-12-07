@@ -42,7 +42,6 @@ def download_and_setup_font():
         with open(font_path, "wb") as f:
             f.write(response.content)
     return font_path
-
 def generate_pdf(content, output_path):
     """Create a PDF with clean formatting."""
     try:
@@ -57,18 +56,24 @@ def generate_pdf(content, output_path):
         pdf.set_font("DejaVu", size=12)
 
         # Sanitize and format content
+        if not isinstance(content, str):
+            raise ValueError("Content passed to generate_pdf must be a string.")
+
         sanitized_content = sanitize_text(content)
         bulleted_content = format_as_bullets(sanitized_content)
 
-        # Debugging content before writing to PDF
-        st.write("Content being written to PDF (debug):", bulleted_content)
+        # Debug: Show content being written to PDF
+        st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
 
         # Add content to PDF
         for line in bulleted_content.split('\n'):
-            pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure line is a string
+            pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure every line is a string
         pdf.output(output_path, 'F')
     except Exception as e:
         st.error(f"Error generating PDF: {e}")
+    st.write("Debug: Tailored Content for PDF", tailored_content)
+    generate_pdf(tailored_content, output_pdf_path)
+
 
 def create_zip_file(output_dir, output_zip_path):
     """Create a ZIP file containing PDFs."""

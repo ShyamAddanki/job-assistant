@@ -27,29 +27,33 @@ def format_as_bullets(content):
     lines = content.split('\n')
     return "\n".join([f"• {line.strip()}" if line.strip() else '' for line in lines])
 
-def generate_pdf(content, output_path):
-    """Create a PDF with clean formatting."""
+def download_and_setup_font():
+    """Download and setup the required font for PDF generation."""
     font_url = "https://github.com/diegodelemos/fpdf2/raw/main/examples/DejaVuSans.ttf"
     font_path = "fonts/DejaVuSans.ttf"
-    
-    # Ensure font exists
     os.makedirs("fonts", exist_ok=True)
     if not os.path.exists(font_path):
+        response = requests.get(font_url, stream=True)
         with open(font_path, "wb") as f:
-            response = requests.get(font_url)
             f.write(response.content)
+    return font_path
 
-    # Set up the PDF
+def generate_pdf(content, output_path):
+    """Create a PDF with clean formatting."""
+    # Set up font
+    font_path = download_and_setup_font()
+
+    # Initialize PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
     pdf.set_font("DejaVu", size=12)
-    
+
     # Sanitize and format content
     sanitized_content = sanitize_text(content)
     bulleted_content = format_as_bullets(sanitized_content)
-    
+
     # Add content to PDF
     for line in bulleted_content.split('\n'):
         pdf.multi_cell(0, 10, line)
@@ -106,8 +110,8 @@ if st.button("Process"):
             st.write("Tailoring resumes...")
             for i, job_description in enumerate(job_descriptions, start=1):
                 tailored_content = tailor_resume(resume_content, job_description)
-                output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{str(i)}.pdf")  # Ensure `i` is a string
-                generate_pdf(tailored_content, output_pdf_path)
+                output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
+                generate_pdf(tailored_content, output_pdf_path)  # `i` is already a string now
 
             # Zip tailored resumes
             st.write("Creating ZIP file...")

@@ -27,6 +27,7 @@ def format_as_bullets(content):
     lines = content.split('\n')
     return "\n".join([f"• {line.strip()}" if line.strip() else '' for line in lines])
 
+@st.cache_resource
 def download_and_setup_font():
     """Download and setup the required font for PDF generation."""
     font_url = "https://github.com/diegodelemos/fpdf2/raw/main/examples/DejaVuSans.ttf"
@@ -111,7 +112,7 @@ if st.button("Process"):
             for i, job_description in enumerate(job_descriptions, start=1):
                 tailored_content = tailor_resume(resume_content, job_description)
                 output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
-                generate_pdf(tailored_content, output_pdf_path)  # `i` is already a string now
+                generate_pdf(tailored_content, output_pdf_path)
 
             # Zip tailored resumes
             st.write("Creating ZIP file...")

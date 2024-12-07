@@ -60,9 +60,12 @@ def generate_pdf(content, output_path):
         sanitized_content = sanitize_text(content)
         bulleted_content = format_as_bullets(sanitized_content)
 
+        # Debugging content before writing to PDF
+        st.write("Content being written to PDF (debug):", bulleted_content)
+
         # Add content to PDF
         for line in bulleted_content.split('\n'):
-            pdf.multi_cell(0, 10, str(line))
+            pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure line is a string
         pdf.output(output_path, 'F')
     except Exception as e:
         st.error(f"Error generating PDF: {e}")

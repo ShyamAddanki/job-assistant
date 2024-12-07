@@ -11,7 +11,8 @@ def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
     with open(pdf_path, 'rb') as file:
         reader = PdfReader(file)
-        text = ''.join([page.extract_text() for page in reader.pages])
+        # Handle None values in extract_text()
+        text = ''.join([page.extract_text() or '' for page in reader.pages])
     return text
 
 def sanitize_text(content):
@@ -20,7 +21,7 @@ def sanitize_text(content):
 
 def tailor_resume(resume_content, job_description):
     """Generate tailored content for the resume."""
-    return f"Tailored Resume Content:\n\n{resume_content}\n\nJob Description Alignment:\n\n{job_description}"
+    return f"Tailored Resume Content:\n\n{str(resume_content)}\n\nJob Description Alignment:\n\n{str(job_description)}"
 
 def format_as_bullets(content):
     """Format content as bullets."""
@@ -57,7 +58,7 @@ def generate_pdf(content, output_path):
 
     # Add content to PDF
     for line in bulleted_content.split('\n'):
-        pdf.multi_cell(0, 10, line)
+        pdf.multi_cell(0, 10, str(line))
     pdf.output(output_path, 'F')
 
 def create_zip_file(output_dir, output_zip_path):
@@ -105,7 +106,8 @@ if st.button("Process"):
             st.write("Fetching job descriptions...")
             with open(job_links_path, 'r', encoding='utf-8') as f:
                 job_links = f.read().splitlines()
-            job_descriptions = [f"Sample job description for {link}" for link in job_links]
+            # Ensure all links are strings
+            job_descriptions = [f"Sample job description for {str(link)}" for link in job_links if link.strip()]
 
             # Generate tailored resumes
             st.write("Tailoring resumes...")
@@ -127,6 +129,6 @@ if st.button("Process"):
                     mime="application/zip"
                 )
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            st.error(f"An error occurred: {str(e)}")
     else:
         st.error("Please upload both files to proceed.")

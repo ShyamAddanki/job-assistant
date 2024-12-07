@@ -4,7 +4,8 @@ import os
 import zipfile
 from PyPDF2 import PdfReader
 import re
-
+import os
+import requests
 # Define Helper Functions
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
@@ -37,6 +38,19 @@ def format_as_bullets(content):
 
 def generate_pdf(content, output_path):
     """Create a PDF file with clean formatting and bullets."""
+    
+    font_url = "https://github.com/diegodelemos/fpdf2/raw/main/examples/DejaVuSans.ttf"
+    font_path = "fonts/DejaVuSans.ttf"
+
+    os.makedirs("fonts", exist_ok=True)
+    if not os.path.exists(font_path):
+    with open(font_path, "wb") as f:
+        response = requests.get(font_url)
+        f.write(response.content)
+
+    pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
+    pdf.set_font("DejaVu", size=12)
+
     pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)

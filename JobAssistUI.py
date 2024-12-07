@@ -40,8 +40,11 @@ def generate_pdf(content, output_path):
     pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    
+    font_path = "fonts/DejaVuSans.ttf"
     # Set up Unicode font
+    pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
+    pdf.set_font("DejaVu", size=12)
+   
     pdf.add_font('DejaVu', '', 'DejaVuSans.ttf', uni=True)
     pdf.set_font('DejaVu', size=12)
 

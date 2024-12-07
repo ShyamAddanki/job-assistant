@@ -106,7 +106,7 @@ if st.button("Process"):
             st.write("Tailoring resumes...")
             for i, job_description in enumerate(job_descriptions, start=1):
                 tailored_content = tailor_resume(resume_content, job_description)
-                output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
+                output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{str(i)}.pdf")  # Ensure `i` is a string
                 generate_pdf(tailored_content, output_pdf_path)
 
             # Zip tailored resumes

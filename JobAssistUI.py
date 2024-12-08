@@ -49,13 +49,17 @@ def generate_pdf(content, output_path):
         font_path = download_and_setup_font()
 
         # Initialize PDF
+        st.write("just before initalizing FPDF ")
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
         pdf.set_font("DejaVu", size=12)
 
+        st.write("just after initalizing FPDF ")
+ 
         # Validate and sanitize content
+        st.write("just before isIntance ")
         if not isinstance(content, str):
             raise ValueError("Content passed to generate_pdf must be a string.")
 
@@ -130,10 +134,8 @@ if st.button("Process"):
             # Generate tailored resumes
             st.write("Tailoring resumes...")
             for i, job_description in enumerate(job_descriptions, start=1):
-                st.write("Just before Calling tailor_resume")
                 tailored_content = tailor_resume(resume_content, job_description)
                 output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
-                st.write("Just before Calling generate_pdf")
                 generate_pdf(tailored_content, output_pdf_path)
 
             # Zip tailored resumes

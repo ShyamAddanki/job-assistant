@@ -46,20 +46,19 @@ def generate_pdf(content, output_path):
     """Create a PDF with clean formatting."""
     try:
         # Set up font
+        st.write("just before calling download_and_setup_font")
         font_path = download_and_setup_font()
-
+        st.write("just after calling download_and_setup_font")
+   
         # Initialize PDF
-        st.write("just before initalizing FPDF ")
+        
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
         pdf.set_font("DejaVu", size=12)
 
-        st.write("just after initalizing FPDF ")
- 
         # Validate and sanitize content
-        st.write("just before isIntance ")
         if not isinstance(content, str):
             raise ValueError("Content passed to generate_pdf must be a string.")
 

@@ -64,14 +64,14 @@ def generate_pdf(content, output_path):
 
         # Debug: Log the sanitized content for PDF generation
         st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
-        print ("######### before bulleted_content.split loop ");
+       
         # Add content to the PDF
         for line in bulleted_content.split('\n'):
             pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure every line is a string
 
         # Save the PDF to the specified output path
         pdf.output(output_path, 'F')
-        print ("######### after bulleted_content.split loop ");
+       
     except Exception as e:
         # Handle exceptions gracefully and log the error
         st.error(f"Error generating PDF: {e}")
@@ -130,8 +130,10 @@ if st.button("Process"):
             # Generate tailored resumes
             st.write("Tailoring resumes...")
             for i, job_description in enumerate(job_descriptions, start=1):
+                st.write("Just before Calling tailor_resume")
                 tailored_content = tailor_resume(resume_content, job_description)
                 output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
+                st.write("Just before Calling generate_pdf")
                 generate_pdf(tailored_content, output_pdf_path)
 
             # Zip tailored resumes

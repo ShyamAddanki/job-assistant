@@ -56,6 +56,8 @@ def generate_pdf(content, output_path):
         pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
         pdf.set_font("DejaVu", size=12)
 
+        st.write("After Initializing PDF")
+
         # Validate and sanitize content
         if not isinstance(content, str):
             raise ValueError("Content passed to generate_pdf must be a string.")

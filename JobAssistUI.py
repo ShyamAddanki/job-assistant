@@ -49,6 +49,7 @@ def generate_pdf(content, output_path):
         font_path = download_and_setup_font()
 
         # Initialize PDF
+        st.write("Before Initializing PDF")
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)

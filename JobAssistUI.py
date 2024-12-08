@@ -21,19 +21,12 @@ def generate_pdf(content, output_path):
     """Create a PDF with clean formatting using the default font."""
     try:
         # Initialize PDF
-        st.write("Before Initializing PDF")
         pdf = FPDF()
-        st.write("PDF object created")
-
         pdf.add_page()
-        st.write("PDF page added")
-
         pdf.set_auto_page_break(auto=True, margin=15)
-        st.write("Auto page break set")
 
         # Set default font (Arial)
         pdf.set_font("Arial", size=12)
-        st.write("Default font set (Arial)")
 
         # Validate and sanitize content
         if not isinstance(content, str):
@@ -42,21 +35,16 @@ def generate_pdf(content, output_path):
         sanitized_content = sanitize_text(content)
         bulleted_content = format_as_bullets(sanitized_content)
 
-        # Debug: Log the sanitized content for PDF generation
-        st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
-
         # Split into lines and ensure each is a string
         lines = bulleted_content.split('\n')
         lines = [str(line) for line in lines]  # Ensure each line is a string
 
         # Add content to the PDF
         for line in lines:
-            st.write(f"Debug: Adding line to PDF -> {line} (Type: {type(line)})")  # Debug each line
-            pdf.multi_cell(0, 10, line if line else "")  # Avoid concatenating invalid types
+            pdf.multi_cell(0, 10, line if line else "")  # Add each line to the PDF
 
         # Save the PDF to the specified output path
         pdf.output(output_path, 'F')
-        st.write("PDF successfully generated")
 
     except Exception as e:
         # Handle exceptions gracefully and log the error

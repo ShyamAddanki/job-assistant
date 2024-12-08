@@ -4,7 +4,6 @@ import os
 import zipfile
 from PyPDF2 import PdfReader
 import re
-import requests
 
 # Helper Functions
 def extract_text_from_pdf(pdf_path):
@@ -17,6 +16,26 @@ def extract_text_from_pdf(pdf_path):
     except Exception as e:
         st.error(f"Error extracting text from PDF: {e}")
         return ""
+
+def sanitize_text(content):
+    """Sanitize text by replacing unsupported characters."""
+    if content is None:
+        return ""
+    # Replace bullet points with dashes or other ASCII characters
+    content = content.replace("•", "-")
+    # Replace non-ASCII characters with spaces
+    content = re.sub(r'[^\x00-\x7F]+', ' ', content)
+    return content
+
+def tailor_resume(resume_content, job_description):
+    """Generate tailored content for the resume."""
+    return f"Tailored Resume Content:\n\n{resume_content}\n\nJob Description Alignment:\n\n{job_description}"
+
+def format_as_bullets(content):
+    """Format content as bullets."""
+    lines = content.split('\n')
+    return "\n".join([f"- {line.strip()}" if line.strip() else '' for line in lines])
+
 def generate_pdf(content, output_path):
     """Create a PDF with clean formatting using the default font."""
     try:
@@ -45,35 +64,11 @@ def generate_pdf(content, output_path):
 
         # Save the PDF to the specified output path
         pdf.output(output_path, 'F')
+        st.write(f"PDF successfully generated: {output_path}")
 
     except Exception as e:
         # Handle exceptions gracefully and log the error
         st.error(f"Error generating PDF: {e}")
-
-def sanitize_text(content):
-    """Remove unsupported characters."""
-    return re.sub(r'[^\x00-\x7F]+', ' ', content)  # Replace non-ASCII characters with a space
-
-def tailor_resume(resume_content, job_description):
-    """Generate tailored content for the resume."""
-    return f"Tailored Resume Content:\n\n{resume_content}\n\nJob Description Alignment:\n\n{job_description}"
-
-def format_as_bullets(content):
-    """Format content as bullets."""
-    lines = content.split('\n')
-    return "\n".join([f"• {line.strip()}" if line.strip() else '' for line in lines])
-
-@st.cache_resource
-def download_and_setup_font():
-    """Download and setup the required font for PDF generation."""
-    font_url = "https://github.com/diegodelemos/fpdf2/raw/main/examples/DejaVuSans.ttf"
-    font_path = "fonts/DejaVuSans.ttf"
-    os.makedirs("fonts", exist_ok=True)
-    if not os.path.exists(font_path):
-        response = requests.get(font_url, stream=True)
-        with open(font_path, "wb") as f:
-            f.write(response.content)
-    return font_path
 
 def create_zip_file(output_dir, output_zip_path):
     """Create a ZIP file containing PDFs."""
@@ -81,8 +76,9 @@ def create_zip_file(output_dir, output_zip_path):
         with zipfile.ZipFile(output_zip_path, 'w') as zipf:
             for root, _, files in os.walk(output_dir):
                 for file in files:
-                    if file.endswith('.pdf'):  # Include only PDFs
-                        file_path = os.path.join(root, file)
+                    file_path = os.path.join(root, file)
+                    # Check if the file is a non-empty PDF before zipping
+                    if file.endswith('.pdf') and os.path.getsize(file_path) > 0:
                         zipf.write(file_path, arcname=os.path.basename(file_path))
         return output_zip_path
     except Exception as e:
@@ -129,9 +125,21 @@ if st.button("Process"):
             # Generate tailored resumes
             st.write("Tailoring resumes...")
             for i, job_description in enumerate(job_descriptions, start=1):
-                tailored_content = tailor_resume(resume_content, job_description)
-                output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
-                generate_pdf(tailored_content, output_pdf_path)
+                try:
+                    tailored_content = tailor_resume(resume_content, job_description)
+                    output_pdf_path = os.path.join(tailored_resumes_dir, f"tailored_resume_{i}.pdf")
+
+                    # Generate the PDF
+                    generate_pdf(tailored_content, output_pdf_path)
+
+                    # Confirm PDF generation
+                    if os.path.exists(output_pdf_path):
+                        st.write(f"PDF successfully generated: {output_pdf_path}")
+                    else:
+                        st.error(f"PDF generation failed: {output_pdf_path}")
+
+                except Exception as e:
+                    st.error(f"An error occurred while processing job description {i}: {e}")
 
             # Zip tailored resumes
             st.write("Creating ZIP file...")

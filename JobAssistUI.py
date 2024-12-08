@@ -46,17 +46,30 @@ def generate_pdf(content, output_path):
     """Create a PDF with clean formatting."""
     try:
         # Set up font
+        st.write("Before Font Setup")
         font_path = download_and_setup_font()
+        st.write(f"Font path: {font_path}")
+
+        if not os.path.exists(font_path):
+            raise FileNotFoundError(f"Font file not found at {font_path}")
+        st.write("Font file verified")
 
         # Initialize PDF
         st.write("Before Initializing PDF")
         pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
-        pdf.set_font("DejaVu", size=12)
+        st.write("PDF object created")
 
-        st.write("After Initializing PDF")
+        pdf.add_page()
+        st.write("PDF page added")
+
+        pdf.set_auto_page_break(auto=True, margin=15)
+        st.write("Auto page break set")
+
+        pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
+        st.write("Font added")
+
+        pdf.set_font("DejaVu", size=12)
+        st.write("Font set")
 
         # Validate and sanitize content
         if not isinstance(content, str):
@@ -68,12 +81,18 @@ def generate_pdf(content, output_path):
         # Debug: Log the sanitized content for PDF generation
         st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
 
+        # Split into lines and ensure each is a string
+        lines = bulleted_content.split('\n')
+        lines = [str(line) for line in lines]  # Force each line to be a string
+
         # Add content to the PDF
-        for line in bulleted_content.split('\n'):
-            pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure every line is a string
+        for line in lines:
+            st.write(f"Debug: Adding line to PDF -> {line} (Type: {type(line)})")  # Debug each line
+            pdf.multi_cell(0, 10, line if line else "")  # Avoid concatenating invalid types
 
         # Save the PDF to the specified output path
         pdf.output(output_path, 'F')
+        st.write("PDF successfully generated")
 
     except Exception as e:
         # Handle exceptions gracefully and log the error

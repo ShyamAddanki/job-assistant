@@ -55,25 +55,26 @@ def generate_pdf(content, output_path):
         pdf.add_font("DejaVu", style="", fname=font_path, uni=True)
         pdf.set_font("DejaVu", size=12)
 
-        # Sanitize and format content
+        # Validate and sanitize content
         if not isinstance(content, str):
             raise ValueError("Content passed to generate_pdf must be a string.")
 
         sanitized_content = sanitize_text(content)
         bulleted_content = format_as_bullets(sanitized_content)
 
-        # Debug: Show content being written to PDF
+        # Debug: Log the sanitized content for PDF generation
         st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
-
-        # Add content to PDF
+        print ("######### before bulleted_content.split loop ");
+        # Add content to the PDF
         for line in bulleted_content.split('\n'):
             pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure every line is a string
-        pdf.output(output_path, 'F')
-    except Exception as e:
-        st.error(f"Error generating PDF: {e}")
-    st.write("Debug: Tailored Content for PDF", tailored_content)
-    generate_pdf(tailored_content, output_pdf_path)
 
+        # Save the PDF to the specified output path
+        pdf.output(output_path, 'F')
+        print ("######### after bulleted_content.split loop ");
+    except Exception as e:
+        # Handle exceptions gracefully and log the error
+        st.error(f"Error generating PDF: {e}")
 
 def create_zip_file(output_dir, output_zip_path):
     """Create a ZIP file containing PDFs."""

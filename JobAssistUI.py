@@ -46,12 +46,9 @@ def generate_pdf(content, output_path):
     """Create a PDF with clean formatting."""
     try:
         # Set up font
-        st.write("just before calling download_and_setup_font")
         font_path = download_and_setup_font()
-        st.write("just after calling download_and_setup_font")
-   
+
         # Initialize PDF
-        
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -67,14 +64,14 @@ def generate_pdf(content, output_path):
 
         # Debug: Log the sanitized content for PDF generation
         st.write("Debug: Sanitized Content for PDF Generation", bulleted_content)
-       
+
         # Add content to the PDF
         for line in bulleted_content.split('\n'):
             pdf.multi_cell(0, 10, str(line) if line else "")  # Ensure every line is a string
 
         # Save the PDF to the specified output path
         pdf.output(output_path, 'F')
-       
+
     except Exception as e:
         # Handle exceptions gracefully and log the error
         st.error(f"Error generating PDF: {e}")
